@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Bot</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var $messages = $('.messages');
+            var $message = $('<div class="message left">').text("Hi, I'm a demo bot built with the help of OpenAi and can answer to the limited questions about Olympics 2022.");
+            $messages.append($message);
+            var url = 'http://localhost:8080/chatbot'; // change to your chat bot backend URL
+
+            function getMessageText() {
+                var $messageInput = $('.message-input');
+                return $messageInput.val();
+            }
+
+            function sendMessage() {
+                var messageText = getMessageText().trim();
+                if (messageText === '') {
+                    return;
+                }
+
+                var $message = $('<div class="message right">').text(messageText);
+                $messages.append($message);
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: {
+                        message: messageText
+                    },
+                    success: function(data) {
+                        var $message = $('<div class="message left">').text(data);
+                        $messages.append($message);
+                        $('.message-input').val('');
+                    },
+                    error: function() {
+                        $messages.append($('<div>').text('Error sending message'));
+                    }
+                });
+            }
+
+            $('.send-button').on('click', function() {
+                sendMessage();
+            });
+
+            $(document).on('keypress', function(e) {
+                if (e.which === 13) {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+    <style type="text/css">
+        .message {
+            padding: 5px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .message.left {
+            background-color: #eee;
+            text-align: left;
+        }
+
+        .message.right {
+            background-color: #a3d3ff;
+            text-align: right;
+        }
+
+        .message-input {
+            width: 100%;
+            height: 40px;
+            font-size: 18px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .send-button {
+            background-color: #a3d3ff;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h1>Chat Bot</h1>
+<div class="messages">
+
+</div>
+<input type="text" class="message-input"  />
+<button class="send-button">Send</button>
+</body>
+</html>
